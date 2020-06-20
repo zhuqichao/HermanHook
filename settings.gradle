@@ -1,0 +1,3 @@
+include ':Hook'
+include ':sample'
+rootProject.name = "HermanHook"
