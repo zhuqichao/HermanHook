@@ -11,13 +11,13 @@ import java.lang.reflect.Proxy;
 public class ServiceHook implements InvocationHandler {
     private static final String TAG = "ServiceHook";
 
-    private IBinder mBase;
+    private final IBinder mBase;
     private Class<?> mStub;
     private Class<?> mInterface;
-    private InvocationHandler mInvocationHandler;
+    private final InvocationHandler mInvocationHandler;
 
     public ServiceHook(IBinder mBase, String iInterfaceName, boolean isStub, InvocationHandler InvocationHandler) {
-        this.mBase = mBase;
+        this.mBase = mBase; //传进来的原始服务，后面替换为自己创建的服务
         this.mInvocationHandler = InvocationHandler;
 
         try {
@@ -37,12 +37,13 @@ public class ServiceHook implements InvocationHandler {
         }
 
         Log.e(TAG, "ERROR!!!!! method:name = " + method.getName());
+        // 其他方法调用原始服务
         return method.invoke(mBase, args);
     }
 
     private static class HookHandler implements InvocationHandler {
         private Object mBase;
-        private InvocationHandler mInvocationHandler;
+        private final InvocationHandler mInvocationHandler;
 
         public HookHandler(IBinder base, Class<?> stubClass, InvocationHandler InvocationHandler) {
             mInvocationHandler = InvocationHandler;
@@ -57,6 +58,7 @@ public class ServiceHook implements InvocationHandler {
 
         @Override
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+            Log.d(TAG, "invoke: method name=" + method.getName());
             if (mInvocationHandler != null) {
                 try {
                     return mInvocationHandler.invoke(mBase, method, args);

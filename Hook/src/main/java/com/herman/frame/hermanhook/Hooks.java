@@ -14,6 +14,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.Arrays;
 
 /**
  * Created by Herman on 2020/6/20.
@@ -23,11 +24,15 @@ public class Hooks {
     private static final String TAG = "Hooks";
 
     public static void hookService(String serviceName, String interfaceName, InvocationHandler invocationHandler) {
+        hookService(serviceName, interfaceName, true, invocationHandler);
+    }
+
+    public static void hookService(String serviceName, String interfaceName, boolean isStub, InvocationHandler invocationHandler) {
         IBinder service = ServiceManager.getService(serviceName);
         if (service != null) {
             IBinder hookService = (IBinder) Proxy.newProxyInstance(IBinder.class.getClassLoader(),
                     new Class[]{IBinder.class},
-                    new ServiceHook(service, interfaceName, true, invocationHandler));
+                    new ServiceHook(service, interfaceName, isStub, invocationHandler));
             ServiceManager.setService(serviceName, hookService);
         } else {
             Log.e(TAG, serviceName + " hook failed!");

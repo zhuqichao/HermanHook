@@ -1,5 +1,6 @@
 package com.herman.frame.hooksample;
 
+import android.app.ActivityManager;
 import android.app.Application;
 import android.content.Context;
 import android.util.Log;
@@ -18,18 +19,28 @@ public class DemoApplacation extends Application {
 
     private static final String TAG = "DemoApplacation";
 
+    private static DemoApplacation mInstance;
+
     @Override
     public void onCreate() {
-        Log.d(TAG, "onCreate: ");
         super.onCreate();
+        mInstance = this;
+    }
+
+    public static DemoApplacation getInstance() {
+        return mInstance;
+    }
+
+    public static Context getContext() {
+        return mInstance.getBaseContext();
     }
 
     @Override
     protected void attachBaseContext(Context base) {//早于onCreate执行
         Log.d(TAG, "attachBaseContext: ");
         super.attachBaseContext(base);
-        Hooks.hookService(Context.WIFI_SERVICE, "android.net.wifi.IWifiManager", mInvocationHandler);
-        Hooks.hookService(Context.NOTIFICATION_SERVICE, "android.app.INotificationManager", mInvocationHandler);
+//        Hooks.hookService(Context.WIFI_SERVICE, "android.net.wifi.IWifiManager", mInvocationHandler);
+//        Hooks.hookService(Context.NOTIFICATION_SERVICE, "android.app.INotificationManager", mInvocationHandler);
         Hooks.hookToast(new Hooks.ToastHook() {
             @Override
             public boolean onShow(TextView view) {
@@ -39,7 +50,7 @@ public class DemoApplacation extends Application {
         });
     }
 
-    private InvocationHandler mInvocationHandler = new InvocationHandler() {
+    private final InvocationHandler mInvocationHandler = new InvocationHandler() {
         @Override
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
             String methodName = method.getName();
@@ -47,4 +58,15 @@ public class DemoApplacation extends Application {
             return method.invoke(proxy, args);
         }
     };
+
+    private String getCurProcessName(Context context) {
+        int pid = android.os.Process.myPid();
+        for (ActivityManager.RunningAppProcessInfo appProcess :
+                ((ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE)).getRunningAppProcesses()) {
+            if (appProcess.pid == pid) {
+                return appProcess.processName;
+            }
+        }
+        return null;
+    }
 }
