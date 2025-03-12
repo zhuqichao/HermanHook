@@ -66,4 +66,17 @@ public class ServiceManager {
         sCacheService.put(serviceName, service);
     }
 
+    public static Map<String, IBinder> getCacheService () {
+        if (sCacheService == null) {
+            try {
+                Field sCache = c_ServiceManager.getDeclaredField("sCache");
+                sCache.setAccessible(true);
+                sCacheService = (Map<String, IBinder>) sCache.get(null);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return sCacheService;
+    }
+
 }

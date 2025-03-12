@@ -1,17 +1,17 @@
 package com.herman.frame.hooksample;
 
 import android.app.Activity;
-import android.content.Context;
-import android.content.Intent;
-import android.net.wifi.WifiManager;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.herman.frame.hermanhook.Hooks;
+import androidx.annotation.RequiresApi;
 
+@RequiresApi(api = Build.VERSION_CODES.O)
 public class MainActivity extends Activity {
 
     private static final String TAG = "MainActivity";
@@ -27,5 +27,6 @@ public class MainActivity extends Activity {
                 Toast.makeText(MainActivity.this, "hello", Toast.LENGTH_LONG).show();
             }
         });
+        ((NotificationManager) getSystemService(NOTIFICATION_SERVICE)).createNotificationChannel(new NotificationChannel("test", "test", 0));
     }
 }

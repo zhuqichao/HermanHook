@@ -3,7 +3,11 @@ package com.herman.frame.hooksample;
 import android.app.ActivityManager;
 import android.app.Application;
 import android.content.Context;
+import android.graphics.Color;
 import android.util.Log;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.herman.frame.hermanhook.Hooks;
@@ -40,14 +44,22 @@ public class DemoApplacation extends Application {
         Log.d(TAG, "attachBaseContext: ");
         super.attachBaseContext(base);
 //        Hooks.hookService(Context.WIFI_SERVICE, "android.net.wifi.IWifiManager", mInvocationHandler);
-//        Hooks.hookService(Context.NOTIFICATION_SERVICE, "android.app.INotificationManager", mInvocationHandler);
+        Hooks.hookService(Context.NOTIFICATION_SERVICE, "android.app.INotificationManager", mInvocationHandler);
+
         Hooks.hookToast(new Hooks.ToastHook() {
             @Override
-            public boolean onShow(TextView view) {
-                view.setText(view.getText() + ": HHHHHH");
+            public boolean onShow(TextView view, View parent) {
+                view.setText("温馨提示：" + view.getText());
+                view.setTextSize(30);
+                view.setTextColor(Color.RED);
+                view.setBackgroundColor(Color.GRAY);
+                ImageView imageView = new ImageView(getContext());
+                imageView.setImageResource(R.mipmap.ic_launcher);
+                ((ViewGroup) parent).addView(imageView);
                 return true;
             }
         });
+
     }
 
     private final InvocationHandler mInvocationHandler = new InvocationHandler() {

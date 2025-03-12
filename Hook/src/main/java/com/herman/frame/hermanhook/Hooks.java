@@ -14,7 +14,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.util.Arrays;
 
 /**
  * Created by Herman on 2020/6/20.
@@ -52,7 +51,7 @@ public class Hooks {
                                 View texView = ((LinearLayout) view).getChildAt(0);
                                 if (texView instanceof TextView) {
                                     if (toastHook != null) {
-                                        if (!toastHook.onShow((TextView) texView)) {
+                                        if (!toastHook.onShow((TextView) texView, (View) view)) {
                                             return null;
                                         }
                                     }
@@ -65,7 +64,7 @@ public class Hooks {
     }
 
     public interface ToastHook {
-        boolean onShow(TextView view);
+        boolean onShow(TextView view, View parent);
     }
 
 }

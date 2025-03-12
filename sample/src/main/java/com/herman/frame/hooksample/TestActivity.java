@@ -1,12 +1,16 @@
 package com.herman.frame.hooksample;
 
-import android.app.Activity;
 import android.app.Dialog;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.util.Log;
 import android.view.View;
-import android.view.WindowManager;
+
+import com.herman.frame.hermanhook.servicehook.ServiceManager;
+
+import java.util.Map;
+import java.util.Set;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -25,6 +29,11 @@ public class TestActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_test);
         Log.d(TAG, "onCreate: ");
+        Map<String, IBinder> services = ServiceManager.getCacheService();
+        Set<String> keset = services.keySet();
+        for (String str : keset) {
+            Log.d(TAG, "onClick: name=" + str + ", binder=" + services.get(str).toString());
+        }
     }
 
     public void onClick(View view) {
