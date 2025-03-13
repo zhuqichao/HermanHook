@@ -3,14 +3,10 @@ package com.herman.frame.hermanhook;
 import android.content.Context;
 import android.os.IBinder;
 import android.util.Log;
-import android.view.View;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import com.herman.frame.hermanhook.servicehook.ServiceHook;
 import com.herman.frame.hermanhook.servicehook.ServiceManager;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
@@ -43,19 +39,18 @@ public class Hooks {
                 new InvocationHandler() {
                     @Override
                     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-                        if ("enqueueToast".equals(method.getName())) {
-                            Field nextView = args[1].getClass().getDeclaredField("mNextView");
-                            nextView.setAccessible(true);
-                            Object view = nextView.get(args[1]);
-                            if (view instanceof LinearLayout) {
-                                View texView = ((LinearLayout) view).getChildAt(0);
-                                if (texView instanceof TextView) {
-                                    if (toastHook != null) {
-                                        if (!toastHook.onShow((TextView) texView, (View) view)) {
-                                            return null;
-                                        }
+                        if ("enqueueTextToast".equals(method.getName())) {
+                            try {
+                                if (args[2] instanceof CharSequence) {
+                                    StringBuilder newText = new StringBuilder((CharSequence) args[2]);
+                                    if (!toastHook.onShow(newText)) {
+                                        return Boolean.FALSE;
+                                    } else {
+                                        args[2] = newText.toString();
                                     }
+                                    return method.invoke(proxy, args);
                                 }
+                            } catch (Exception ignored) {
                             }
                         }
                         return method.invoke(proxy, args);
@@ -64,7 +59,7 @@ public class Hooks {
     }
 
     public interface ToastHook {
-        boolean onShow(TextView view, View parent);
+        boolean onShow(StringBuilder text);
     }
 
 }

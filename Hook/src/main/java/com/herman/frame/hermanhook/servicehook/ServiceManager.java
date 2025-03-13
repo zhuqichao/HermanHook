@@ -53,20 +53,12 @@ public class ServiceManager {
             return;
         }
 
-        if (sCacheService == null) {
-            try {
-                Field sCache = c_ServiceManager.getDeclaredField("sCache");
-                sCache.setAccessible(true);
-                sCacheService = (Map<String, IBinder>) sCache.get(null);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
+        getCacheService();
         sCacheService.remove(serviceName);
         sCacheService.put(serviceName, service);
     }
 
-    public static Map<String, IBinder> getCacheService () {
+    public static Map<String, IBinder> getCacheService() {
         if (sCacheService == null) {
             try {
                 Field sCache = c_ServiceManager.getDeclaredField("sCache");
